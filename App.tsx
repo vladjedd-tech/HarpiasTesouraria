@@ -28,8 +28,13 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; roles?: string[] }> 
   const { isLoading: financeLoading } = useFinance();
 
   if (authLoading || financeLoading) return <GlobalLoader />;
-  if (!isAuthenticated) return <Navigate to="/login" />;
-  if (user?.requiresPasswordChange) return <Navigate to="/change-password" />;
+  
+  // Verificação explícita de user para satisfazer o TypeScript
+  if (!isAuthenticated || !user) return <Navigate to="/login" />;
+  
+  if (user.requiresPasswordChange) return <Navigate to="/change-password" />;
+  
+  // Aqui o TS já sabe que 'user' existe e é do tipo 'User'
   if (roles && !roles.includes(user.role)) return <Navigate to="/" />;
 
   return <Layout>{children}</Layout>;
